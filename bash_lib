@@ -295,7 +295,7 @@ function CountingDown()
 }
 
 function __add {  
-   LogPrint $(( ${1:-0} + ${2:-0} ] ))
+   LogPrint $(( ${1:-0} + ${2:-0} ))
 }  
   
 #乘积  
