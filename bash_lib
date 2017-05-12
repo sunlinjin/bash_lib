@@ -295,19 +295,19 @@ function CountingDown()
 }
 
 function __add {  
-   LogPrint $[ ${1:-0} + ${2:-0} ]  
+   LogPrint $(( ${1:-0} + ${2:-0} ] ))
 }  
   
 #乘积  
 function __mul {  
-   LogPrint $[ ${1:-0} * ${2:-0} ]  
+   LogPrint $(( ${1:-0} * ${2:-0} ))
 }  
   
 #除法  $1 / $2
 function __div {  
-    if [ ${2:-1} -ne 0 ]  
+    if [ "${2:-1}" -ne 0 ]  
     then  
-        LogPrint $[ ${1:-0} / ${2:-0} ]  
+        LogPrint $(( ${1:-0} / ${2:-0} ))
     else  
         LogPrint -1  
     fi  
