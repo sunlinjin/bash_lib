@@ -1,7 +1,7 @@
 # begin of bash_lib file
 
 if [ "0" = "${bash_lib_included_flag:-0}" ]; then
-    declare -x bash_lib_included_flag=included
+    declare -x bash_lib_included_flag=bash_lib_included
 else
     echo Warning, Double sourced!
 fi
@@ -13,7 +13,7 @@ shopt -s expand_aliases
 alias LogPrint='echo'
 
 # TODO & Bug:
-# source this file multi-times, the global readonly definintion will issue errors(20170418)
+# source this file multi-times, the global readonly definintion will issue errors (20170418)
 
 # Dependency :
 
@@ -190,13 +190,13 @@ function TransferToDecimal()
         else
             _returnValue=1
         fi
-        
+
         if [ ${_returnValue} -ne 0 ] || ! IsValidOctal "${g_Result[${g_Index}]}"; then
             continue
         fi
         ((g_Index=g_Index+1))
     done
-    
+
     echo "${g_Result[@]}"
 
     return "${_returnValue}";
@@ -294,23 +294,27 @@ function CountingDown()
     return 0
 }
 
-function __add {  
+###################
+### Calculation ###
+###################
+
+function __add {
    LogPrint $(( ${1:-0} + ${2:-0} ))
-}  
-  
-#乘积  
-function __mul {  
+}
+
+#乘积
+function __mul {
    LogPrint $(( ${1:-0} * ${2:-0} ))
-}  
-  
+}
+
 #除法  $1 / $2
-function __div {  
-    if [ "${2:-1}" -ne 0 ]  
-    then  
+function __div {
+    if [ "${2:-1}" -ne 0 ]
+    then
         LogPrint $(( ${1:-0} / ${2:-0} ))
-    else  
-        LogPrint -1  
-    fi  
-}  
+    else
+        LogPrint -1
+    fi
+}
 
 # end of bash_lib file
