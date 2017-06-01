@@ -14,6 +14,80 @@ alias LogPrint='echo'
 
 # TODO & Bug:
 # source this file multi-times, the global readonly definintion will issue errors (20170418)
+# random number generate function
+# pasuse function, read -n1 -r -p "Press any key to continue..." key
+    # read does this:
+    # user@host:~$ read -n1 -r -p "Press any key to continue..." key
+    # [...]
+    # user@host:~$ 
+    # The -n1 specifies that it only waits for a single character. The -r puts it into raw mode, which is necessary because otherwise, if you press something like backslash, it doesn't register until you hit the next key. The -p specifies the prompt, which must be quoted if it contains spaces. The key argument is only necessary if you want to know which key they pressed, in which case you can access it through $key.
+    # If you are using Bash, you can also specify a timeout with -t, which causes read to return a failure when a key isn't pressed. So for example:
+    # read -t5 -n1 -r -p 'Press any key in the next five seconds...' key
+    # if [ "$?" -eq "0" ]; then
+        # echo 'A key was pressed.'
+    # else
+        # echo 'No key was pressed.'
+    # fi
+            
+    # Strictly speaking, that would be "Enter any non-NUL character to continue". Some keys don't send any character (like Ctrl...) and some send more than one (like F1, Home...). bash ignores NUL characters.
+
+
+    # 100
+    # down vote
+    # I use a lot these ways that are very short, they are like @theunamedguy and @Jim solutions but with timeout and silent mode in addition.
+    # I especially love the last case and use it in a lot of script that run in loop until the user press Enter.
+
+    # Commands
+
+    # Enter solution
+    # read -rsp $'Press enter to continue...\n'
+    # Escape solution (with -d $'\e')
+    # read -rsp $'Press escape to continue...\n' -d $'\e'
+    # Any key solution (with -n 1)
+    # read -rsp $'Press any key to continue...\n' -n 1 key
+    # # echo $key
+    # Question with preselected choice (with -ei $'Y')
+    # read -rp $'Are you sure (Y/n) : ' -ei $'Y' key;
+    # # echo $key
+    # Timeout solution (with -t 5)
+    # read -rsp $'Press any key or wait 5 seconds to continue...\n' -n 1 -t 5;
+    # Sleep enhanced alias
+    # read -rst 0.5; timeout=$?
+    # # echo $timeout
+    # Explanation
+
+    # -r specifies raw mode, which don't allow combined characters like "\" or "^".
+
+    # -s specifies silent mode, and because we don't need keyboard output.
+
+    # -p $'prompt' specifies the prompt, which need to be between $' and ' to let spaces and escaped characters. Be careful, you must put between single quotes with dollars symbol to benefit escaped characters, otherwise you can use simple quotes.
+
+    # -d $'\e' specifies escappe as delimiter charater, so as a final character for current entry, this is possible to put any character but be careful to put a character that the user can type.
+
+    # -n 1 specifies that it only needs a single character.
+
+    # -e specifies readline mode.
+
+    # -i $'Y' specifies Y as initial text in readline mode.
+
+    # -t 5 specifies a timeout of 5 seconds
+
+    # key serve in case you need to know the input, in -n1 case, the key that has been pressed.
+
+    # $? serve to know the exit code of the last program, for read, 142 in case of timeout, 0 correct input. Put $? in a variable as soon as possible if you need to test it after somes commands, because all commands would rewrite $?
+    
+    # read -n1 is not portable. A portable way to do the same might be:
+
+    # (   trap "stty $(stty -g;stty -icanon)" EXIT
+    # LC_ALL=C dd bs=1 count=1 >/dev/null 2>&1
+    # )   </dev/tty
+    # Besides using  read, for just a press ENTER to continue prompt you could do:
+
+    # sed -n q </dev/tty
+
+# funny function like cowsay figlet
+# alias LogPrint=':' is this can mute all display ?
+
 
 # Dependency :
 
@@ -65,6 +139,33 @@ alias LogPrint='echo'
 ###
 ###     return 0
 ### }
+
+function _color_()
+{
+    case "$1" in
+        red)    nn="31";;
+        green)  nn="32";;
+        yellow) nn="33";;
+        blue)   nn="34";;
+        purple) nn="35";;
+        cyan)   nn="36";;
+    esac
+    ff=""
+    case "$2" in
+        bold)   ff=";1";;
+        bright) ff=";2";;
+        uscore) ff=";4";;
+        blink)  ff=";5";;
+        invert) ff=";7";;
+    esac
+    color_begin=`echo -e -n "\033[${nn}${ff}m"`
+    color_end=`echo -e -n "\033[0m"`
+    while read line; do
+        echo "${color_begin}${line}${color_end}"
+    done
+}
+
+### echo "this is a test" | _color_ blue bold
 
 function IsDigitOnly()
 # check if $1 does indeed contain only characters digit, 0-9
@@ -245,11 +346,11 @@ function IsValidIP()
             LogPrint "${var} is not valid a IP address."
             _returnValue=1
         else
-            LogPrint match
-            LogPrint "${BASH_REMATCH[1]}"
-            LogPrint "${BASH_REMATCH[2]}"
-            LogPrint "${BASH_REMATCH[3]}"
-            LogPrint "${BASH_REMATCH[4]}"
+            LogPrint "${var} is valid IP address, and the match result is :"
+            LogPrint "1st section : ${BASH_REMATCH[1]}"
+            LogPrint "2nd section : ${BASH_REMATCH[2]}"
+            LogPrint "3rd section : ${BASH_REMATCH[3]}"
+            LogPrint "4th section : ${BASH_REMATCH[4]}"
         fi
 
         # echo $var | grep -E "^[0-9]\{1,3\}\.\([0-9]\{1,3\}\.\)\{2\}[0-9]\{1,3\}$" > /dev/null;
