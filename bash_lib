@@ -74,23 +74,22 @@ alias LogPrint='echo'
 ###     return 0
 ### }
 
-# for pause test
-# for var in 1 2 3;do echo ${var};pause;done
+# test command : for var in 1 2 3;do echo ${var};pause;done
 function pause()
 {
-	SAVEDSTTY="$(stty -g)"
-	stty -echo
-	stty raw
-	dd if=/dev/tty bs=1 count=1 2>/dev/null
-	stty -raw
-	stty echo
-	stty $SAVEDSTTY
+    SAVEDSTTY="$(stty -g)"
+    stty -echo
+    stty raw
+    dd if=/dev/tty bs=1 count=1 2>/dev/null
+    stty -raw
+    stty echo
+    stty $SAVEDSTTY
   
-	# read does this:
+    # read does this:
     # read -n1 -r -p "Press any key to continue..." key
     # The -n1 specifies that it only waits for a single character. The -r puts it into raw mode, which is necessary because otherwise, if you press something like backslash, it doesn't register until you hit the next key. The -p specifies the prompt, which must be quoted if it contains spaces. The key argument is only necessary if you want to know which key they pressed, in which case you can access it through $key.
     # If you are using Bash, you can also specify a timeout with -t, which causes read to return a failure when a key isn't pressed. So for example : 
-	# read -t5 -n1 -r -p 'Press any key in the next five seconds...' key
+    # read -t5 -n1 -r -p 'Press any key in the next five seconds...' key
     # if [ "$?" -eq "0" ]; then
         # echo 'A key was pressed.'
     # else
@@ -102,67 +101,69 @@ function pause()
     # -s specifies silent mode, and because we don't need keyboard output.
     # -p $'prompt' specifies the prompt, which need to be between $' and ' to let spaces and escaped characters. Be careful, you must put between single quotes with dollars symbol to benefit escaped characters, otherwise you can use simple quotes.
     # Enter solution, read line, and mute the input char(s) display
-	# read -rsp $'Press enter to continue...\n'
+    # read -rsp $'Press enter to continue...\n'
 
-	# Escape solution
-	# -d $'\e' specifies escappe as delimiter charater, so as a final character for current entry, this is possible to put any character but be careful to put a character that the user can type.
-	# read -rsp $'Press escape to continue...\n' -d $'\e'
+    # Escape solution
+    # -d $'\e' specifies escappe as delimiter charater, so as a final character for current entry, this is possible to put any character but be careful to put a character that the user can type.
+    # read -rsp $'Press escape to continue...\n' -d $'\e'
 
-	# Any key except Ctrl Shift Alt etc.
-	# -n 1 specifies that it only needs a single character.
-	# read -rsp $'Press any key to continue...\n' -n 1 key
-	# echo $key
+    # Any key except Ctrl Shift Alt etc.
+    # -n 1 specifies that it only needs a single character.
+    # read -rsp $'Press any key to continue...\n' -n 1 key
+    # echo $key
 
-	# Question with preselected choice, -e specifies readline mode. -i $'Y' specifies Y as initial text in readline mode.
-	# -e specifies readline mode.
-	# -i $'Y' specifies Y as initial text in readline mode.
-	# key serve in case you need to know the input, in -n1 case, the key that has been pressed.
-	# read -rp $'Are you sure (Y/n) : ' -ei $'Y' key;
-	# echo $key
+    # Question with preselected choice, -e specifies readline mode. -i $'Y' specifies Y as initial text in readline mode.
+    # -e specifies readline mode.
+    # -i $'Y' specifies Y as initial text in readline mode.
+    # key serve in case you need to know the input, in -n1 case, the key that has been pressed.
+    # read -rp $'Are you sure (Y/n) : ' -ei $'Y' key;
+    # echo $key
 
-	# Timeout solution
-	# -t 5 specifies a timeout of 5 seconds
-	# read -rsp $'Press any key or wait 2 seconds to continue...\n' -n 1 -t 2;
-	
-	# Sleep enhanced alias
-	# $? serve to know the exit code of the last program, for read, 142 in case of timeout, 0 correct input. Put $? in a variable as soon as possible if you need to test it after somes commands, because all commands would rewrite $?
+    # Timeout solution
+    # -t 5 specifies a timeout of 5 seconds
+    # read -rsp $'Press any key or wait 2 seconds to continue...\n' -n 1 -t 2;
+    
+    # Sleep enhanced alias
+    # $? serve to know the exit code of the last program, for read, 142 in case of timeout, 0 correct input. Put $? in a variable as soon as possible if you need to test it after somes commands, because all commands would rewrite $?
     # read -rst 3; timeout=$?
     # echo $timeout
-	
-	# read -n1 is not portable. A portable way to do the same might be:
+    
+    # read -n1 is not portable. A portable way to do the same might be:
     # (   trap "stty $(stty -g;stty -icanon)" EXIT
     # LC_ALL=C dd bs=1 count=1 >/dev/null 2>&1
     # )   </dev/tty
     # Besides using read, for just a press ENTER to continue prompt you could do:
     # sed -n q &>/dev/null </dev/tty
+    
+    # read -p "read"
 
-	return 0
+    return 0
 }
 
 function GenRandomNum()
 {
-	local RandomNum=""
-	
-	
-	echo $RandomNum
+    local RandomNum=""
+    
+    
+    echo $RandomNum
 }
 
 # $1, length, if not, 8 chars ???
 function GenRandomString()
 {
-	local RandomString=""
-	
-	
-	echo $RandomString
+    local RandomString=""
+    
+    
+    echo $RandomString
 }
 
 # default, 8 letters(both upper case and lower case), digits, underline, other chars like $ ^ & etc.
 function GenRandomPsw()
 {
-	local RandomPsw=""
-	
-	
-	echo $RandomPsw
+    local RandomPsw=""
+    
+    
+    echo $RandomPsw
 }
 
 function _color_()
