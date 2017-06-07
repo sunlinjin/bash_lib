@@ -8,6 +8,17 @@ fi
 
 shopt -s expand_aliases
 
+function UsageOfBashLib()
+{
+    # TODO : grep this file to get all function name and add the comments of each function.
+    # Here Document, usually used to instead the fixed user input.
+    cat <<- EOF
+Usage: source path/to/file
+EOF
+
+    return 0
+}
+
 # define for test, due to the function LogPrint can not be multi-sourced
 # alias LogPrint='echo this is a test of alias;echo'
 alias LogPrint='echo'
@@ -35,6 +46,15 @@ alias LogPrint='echo'
 
 
 ### # the following definintion should not add the leading underline, due to the caller need to use them.
+### 字颜色：30—–37                     |  字背景颜色范围：40—–47 
+### echo -e “\033[30m black  \033[0m”  |  echo -e “\033[40;37m bg black,  fg white \033[0m” 
+### echo -e “\033[31m red    \033[0m”  |  echo -e “\033[41;37m bg red,    fg white \033[0m” 
+### echo -e “\033[32m green  \033[0m”  |  echo -e “\033[42;37m bg green,  fg white \033[0m” 
+### echo -e “\033[33m yelow  \033[0m”  |  echo -e “\033[43;37m bg yellow, fg white \033[0m” 
+### echo -e “\033[34m blue   \033[0m”  |  echo -e “\033[44;37m bg blue,   fg white \033[0m” 
+### echo -e “\033[35m purple \033[0m”  |  echo -e “\033[45;37m bg purple, fg white \033[0m” 
+### echo -e “\033[36m cyan   \033[0m”  |  echo -e “\033[46;37m bg cyan,   fg white \033[0m”
+### echo -e “\033[37m white  \033[0m”  |  echo -e “\033[47;30m bg white,  fg black \033[0m” 
 ### declare -r ECHO="echo" # just to replace echo
 ### declare -r ERROR="error" # print red color text
 ### declare -r WARN="warn" # print yellow color text
@@ -75,9 +95,292 @@ alias LogPrint='echo'
 ###     return 0
 ### }
 
+### TODO : the following function is another version of Log print, need to be merge with the former one.
+### # Begin of function LogPrint
+### # Description : Print the text with specified format, if no parameter input, a new line will be print.
+### # Usage : LogPrint [ Fmt_Format ] "Soft/Hard quoted message content"
+### # Usage : LogPrint "Format_1" "Format_2" ... "Format_n" "Soft/Hard quoted message content" 
+### # Usage : LogPrint SPECIAL ColourSetting "Soft/Hard quoted message content, disable sequence will be added automatically."
+### 
+### # external variables for LogPrint
+### declare -r Fmt_ECHO="echo" # just to replace echo, same effect with message
+### declare -r Fmt_ERROR="error" # print red colour text
+### declare -r Fmt_WARN="warn" # print yellow colour text
+### declare -r Fmt_INFO="info" # print green colour text
+### declare -r Fmt_MESSAGE="message" # no colour
+### declare -r Fmt_HIGHLIGHT="highlight" #same with sourceInsight, highlight the messages, yellow background and black text
+### 
+### declare -r Fmt_COLOUR_OFF="format_colour_off" # 0 reset to default colour settings
+### declare -r Fmt_NORMAL="format_normal" # default colour
+### declare -r Fmt_BOLD="format_bold" # display bold text, 1
+### declare -r Fmt_HALF_BRIGHTNESS="format_half_brightness" # 2 half brightness
+### declare -r Fmt_UNDER_LINE="format_under_line" # display under line, 3
+### declare -r Fmt_BLINK="format_blink" # 5 blink text
+### declare -r Fmt_EXCHANGE_BG_FG="format_reverse_bg_fg" # 7 exchange back ground colour and foreground colour
+### declare -r Fmt_NONEWLINE="format_no_new_line" # do not print a new line after the message
+### 
+### declare -r Fmt_DISABLE_UNDER_LINE="format_disable_under_line" # display under line, 3
+### declare -r Fmt_DISABLE_BLINK="format_disable_blink" # 5 blink text
+### declare -r Fmt_DISABLE_EXCHANGE_BG_FG="format_disable_reverse_bg_fg" # 7 exchange back ground colour and foreground colour
+### 
+### # 字颜色：30—–37                     |  字背景颜色范围：40—–47 
+### # echo -e “\033[30m black  \033[0m”  |  echo -e “\033[40;37m bg black,  fg white \033[0m” 
+### # echo -e “\033[31m red    \033[0m”  |  echo -e “\033[41;37m bg red,    fg white \033[0m” 
+### # echo -e “\033[32m green  \033[0m”  |  echo -e “\033[42;37m bg green,  fg white \033[0m” 
+### # echo -e “\033[33m yelow  \033[0m”  |  echo -e “\033[43;37m bg yellow, fg white \033[0m” 
+### # echo -e “\033[34m blue   \033[0m”  |  echo -e “\033[44;37m bg blue,   fg white \033[0m” 
+### # echo -e “\033[35m purple \033[0m”  |  echo -e “\033[45;37m bg purple, fg white \033[0m” 
+### # echo -e “\033[36m cyan   \033[0m”  |  echo -e “\033[46;37m bg cyan,   fg white \033[0m”
+### # echo -e “\033[37m white  \033[0m”  |  echo -e “\033[47;30m bg white,  fg black \033[0m” 
+### 
+### #text colour / foreground colour
+### declare -r Fmt_BLACK="format_black" # black text 30
+### declare -r Fmt_RED="format_red" # red text 31
+### declare -r Fmt_GREEN="format_green" # green text 32
+### declare -r Fmt_YELLOW="format_yellow" # yellow text 33
+### declare -r Fmt_BLUE="format_blue" # blue text 34
+### declare -r Fmt_PURPLE="format_purple" # purple text 35
+### declare -r Fmt_CYAN="format_cyan" # cyan text 36
+### declare -r Fmt_WHITE="format_white" # white text 37
+### declare -r Fmt_GRAY="format_gray" # gray text 37
+### # background colour
+### declare -r Fmt_BG_BLACK="format_bg_black" # black 40
+### declare -r Fmt_BG_RED="format_bg_red" # red 41
+### declare -r Fmt_BG_GREEN="format_bg_green" # green 42
+### declare -r Fmt_BG_YELLOW="format_bg_yellow" # yellow 43
+### declare -r Fmt_BG_BLUE="format_bg_blue" # blue 44
+### declare -r Fmt_BG_PURPLE="format_bg_purple" # purple 45
+### declare -r Fmt_BG_CYAN="format_bg_cyan" # cyan 46
+### declare -r Fmt_BG_WHITE="format_bg_white" # white 47
+### declare -r Fmt_BG_GRAY="format_bg_gray" # gray 47
+### 
+### declare -r Fmt_SPECIAL="format_special" # User customized.
+### 
+### # echo -e "\033[fg;bg;ctlm  messages \033[0m"
+### 
+### function LogPrint()
+### {
+###     local    IsFeedNewLine=true
+###     local    LogContent=""
+###     local    LogContentPrefix=""
+###     local    LogContentSuffix=""
+###     local -r ColourOff='\033[0m'
+### 
+###     for para in "$@"
+###     do
+###         case "$para" in
+###             "${Fmt_ERROR}" | "${Fmt_WARN}" | "${Fmt_INFO}" ) LogContentPrefix="- $(date) -- [$1] : ";;& # must be processed first.
+###             "${Fmt_ECHO}"       ) LogContent="${LogContent}\033[0m";;
+###             "${Fmt_MESSAGE}"    ) LogContent="${LogContent}\033[32m";;
+###             "${Fmt_INFO}"       ) LogContent="${LogContent}\033[32m";;
+###             "${Fmt_WARN}"       ) LogContent="${LogContent}\033[33m";;
+###             "${Fmt_ERROR}"      ) LogContent="${LogContent}\033[31m";;
+###             "${Fmt_HIGHLIGHT}"  ) LogContent="${LogContent}\033[7m\033[33m";;
+###             "${Fmt_COLOUR_OFF}" ) LogContent="${LogContent}\033[0m";;
+###             "${Fmt_NORMAL}"     ) LogContent="${LogContent}\033[0m";;
+###             "${Fmt_BOLD}"       ) LogContent="${LogContent}\033[1m";;
+###             "${Fmt_HALF_BRIGHTNESS}"        ) LogContent="${LogContent}\033[2m";;
+###             "${Fmt_UNDER_LINE}"             ) LogContent="${LogContent}\033[4m";;
+###             "${Fmt_BLINK}"                  ) LogContent="${LogContent}\033[5m";;
+###             "${Fmt_EXCHANGE_BG_FG}"         ) LogContent="${LogContent}\033[7m";;
+###             "${Fmt_DISABLE_UNDER_LINE}"     ) LogContent="${LogContent}\033[24m";;
+###             "${Fmt_DISABLE_BLINK}"          ) LogContent="${LogContent}\033[25m";;
+###             "${Fmt_DISABLE_EXCHANGE_BG_FG}" ) LogContent="${LogContent}\033[27m";;
+###             "${Fmt_BG_BLACK}"  ) LogContent="${LogContent}\033[40m";;
+###             "${Fmt_BG_RED}"    ) LogContent="${LogContent}\033[41m";;
+###             "${Fmt_BG_GREEN}"  ) LogContent="${LogContent}\033[42m";;
+###             "${Fmt_BG_YELLOW}" ) LogContent="${LogContent}\033[43m";;
+###             "${Fmt_BG_BLUE}"   ) LogContent="${LogContent}\033[44m";;
+###             "${Fmt_BG_PURPLE}" ) LogContent="${LogContent}\033[45m";;
+###             "${Fmt_BG_CYAN}"   ) LogContent="${LogContent}\033[46m";;
+###             "${Fmt_BG_WHITE}"  ) LogContent="${LogContent}\033[47m";;
+###             "${Fmt_BG_GRAY}"   ) LogContent="${LogContent}\033[47m";;
+###             "${Fmt_BLACK}"     ) LogContent="${LogContent}\033[30m";;
+###             "${Fmt_RED}"       ) LogContent="${LogContent}\033[31m";;
+###             "${Fmt_GREEN}"     ) LogContent="${LogContent}\033[32m";;
+###             "${Fmt_YELLOW}"    ) LogContent="${LogContent}\033[33m";;
+###             "${Fmt_BLUE}"      ) LogContent="${LogContent}\033[34m";;
+###             "${Fmt_PURPLE}"    ) LogContent="${LogContent}\033[35m";;
+###             "${Fmt_CYAN}"      ) LogContent="${LogContent}\033[36m";;
+###             "${Fmt_WHITE}"     ) LogContent="${LogContent}\033[37m";;
+###             "${Fmt_GRAY}"      ) LogContent="${LogContent}\033[37m";;
+###             "${Fmt_NONEWLINE}" ) IsFeedNewLine=false;;
+###             "${Fmt_SPECIAL}"   ) break;;
+###             *                  ) LogContent="${LogContent}${para}";;
+###         esac
+###     done
+### 
+###     if [ "${IsFeedNewLine}" == "true" ]; then
+###         echo -e "${LogContentPrefix}${LogContent}${LogContentSuffix}${ColourOff}"
+###     else
+###         echo -ne "${LogContentPrefix}${LogContent}${LogContentSuffix}${ColourOff}"
+###     fi
+### 
+###     return 0
+### }
+
+
+function CountingDown()
+{
+    # max input value is 99
+    #clear
+    local backSpaceCount="\b"
+    LogPrint "${Fmt_INFO}" "$1 seconds counting down, \nif you want to cancel this operation, \nyou can strike ctrl + c"
+    
+    if [ -n "$1" -a $1 -ge 10 ]; then backSpaceCount="\b\b"; fi
+
+    for i in `seq -w $1 -1 1`
+    do
+        LogPrint "${Fmt_NONEWLINE}" "${backSpaceCount}>>>>>$i"
+        sleep 1;
+    done
+    LogPrint "${backSpaceCount}\ Good Luck"
+    
+    return 0
+}
+
+# to lower Case
+# para1 : string to be transfer
+function ToLowerCase()
+{
+    echo $1 | tr '[A-Z]''[a-z]'
+    # echo $1 | tr [:upper:] [:lower:]
+}
+ 
+# to upper case
+# para1 : string to be transfer
+function ToUpperCase()
+{
+    echo $1 | tr '[a-z]''[A-Z]'
+    # echo $1 | tr [:lower:] [:upper:]
+}
+
+# Description : get the args[0] days before or later args[1]
+# args[0], number of days, +3 means 3 days later, -3 means 3 days before
+# args[1], date, format : yyyy-MM-dd, default today
+#     date -d "20170104 128 days" +%F
+#     date -d "20170104 128 days ago" +%F
+function get_expected_date()
+{
+    local lSeconds=0
+    local lDaysOffset=+1
+    local lBaseDate=$(date +%F)
+    
+    case $# in
+        0)
+            echo "No input parameters, use the default value $lDaysOffset $lBaseDate"
+        ;;
+        1)
+            lDaysOffset="$1"
+        ;;
+        *)
+            lDaysOffset="$1"
+            lBaseDate=$2
+        ;;
+    esac
+    
+    lSeconds=`date -d $lBaseDate +%s`
+    if [ "${lDaysOffset:0:1}" = "-" ];then
+        lSeconds=$((lSeconds - 86400*${lDaysOffset:1}))
+    elif [ "${lDaysOffset:0:1}" = "+" ];then
+        lSeconds=$((lSeconds + 86400*${lDaysOffset:1}))
+    else # + can be omitted
+        lSeconds=$((lSeconds + 86400*${lDaysOffset}))
+    fi
+    days_expect=`date -d @$lSeconds +%F`
+    printf "$lBaseDate offset by %2s day(s) is $days_expect\n" "$lDaysOffset"
+
+    return 0
+}
+
+function IsInt()
+{
+    expr $1 + 0&>/dev/null
+    if [ $? -ne 0 ]; then
+        # LogPrint "parameter is not a integer!"
+        return 1
+    fi
+    
+    return 0
+    # tmp=`echo $1|sed 's/[0-9]//g'|sed 's/[-+]//g'`
+    # [ -n "${tmp}"]&& { echo "Args must be integer!";exit 1; }
+    
+    # # Bash
+    # if [[ $foo != *[!0-9]* ]]; then
+        # echo "'$foo' is strictly numeric"
+    # else
+        # echo "'$foo' has a non-digit somewhere in it"
+    # fi
+    
+    # # POSIX
+    # case $var in
+        # '')
+            # printf 'var is empty\n';;
+        # *[!0-9]*)
+            # printf '%s has a non-digit somewhere in it\n' "$var";;
+        # *)
+            # printf '%s is strictly numeric\n' "$var";;
+    # esac >&2
+    
+    # # POSIX
+    # case $var in
+        # '' | *[!0-9]*)
+            # echo "$0: $var: invalid digit" >&2; exit 1;;
+    # esac
+    
+    # # POSIX
+    # case ${var#[-+]} in   # notice ${var#prefix} substitution to trim sign
+        # '')
+            # printf 'var is empty\n';;
+        # *.*.*)
+            # printf '%s has more than one decimal point in it\n' "$var";;
+        # *[!0-9.]*)
+            # printf '%s has a non-digit somewhere in it\n' "$var";;
+        # *)
+            # printf '%s looks like a valid float\n' "$var";;
+    # esac >&2
+    
+    # shopt -s extglob
+    # [[ $var = +([0-9]) ]]
+    
+    # # Bash / ksh
+    # shopt -s extglob
+
+    # if [[ $foo = @(*[0-9]*|!([+-]|)) && $foo = ?([+-])*([0-9])?(.*([0-9])) ]]; then
+      # echo 'foo is a floating-point number'
+    # fi
+    
+    # # Bourne
+    # if echo "$foo" | grep -qE '^[-+]?([0-9]+\.?|[0-9]*\.[0-9]+)$'; then
+        # echo "'$foo' is a number"
+    # else
+        # echo "'$foo' is not a number"
+    # fi
+    
+    # # Bash
+    # # The regexp must be stored in a var and expanded for backward compatibility with versions < 3.2
+
+    # regexp='^[-+]?[0-9]*(\.[0-9]*)?$'
+    # if [[ $foo = *[0-9]* && $foo =~ $regexp ]]; then
+        # echo "'$foo' looks rather like a number"
+    # else
+        # echo "'$foo' doesn't look particularly numeric to me"
+    # fi
+    
+    # # fails with ksh
+    # if [ "$foo" -eq "$foo" ] 2>/dev/null; then
+     # echo "$foo is an integer"
+    # fi
+    
+    # if printf %f "$foo" >/dev/null 2>&1; then
+      # echo "$foo is a float"
+    # fi
+}
+
 # test command : for var in 1 2 3;do echo ${var};pause;done
 function pause()
 {
+    LogPrint "+++++++++++++++++++++++++ Press any key to continue ! +++++++++++++++++++++++++"
     SAVEDSTTY="$(stty -g)"
     stty -echo
     stty raw
@@ -137,8 +440,33 @@ function pause()
     # sed -n q &>/dev/null </dev/tty
 
     # read -p "read"
+    
+    # read -n 1 -p "$*" INP
+    # if [ $INP != '' ] ; then
+    #         LogPrint "${Fmt_NONEWLINE}" '\b \n'
+    # fi
 
     return 0
+}
+
+# TODO
+function get_user_input()
+{
+    # TODO : try the command "select" to implement this function
+    read -p "please input the project name ( FSM4.0 / PSINT / PSINT3 / FB1311 / FB1304 / FB1407 / trunk ) ,then press Enter (Default "trunk", Use "Ctrl + Backspace" to fix the typo.):" KEY
+    CheckBranchName "${KEY}"
+    if [ "$?" != "0" ]; then
+        return 1
+    fi
+    return 0
+}
+
+# because of some ssh terminal do not support the backspace ( ctrl + backspace maybe ?), 
+# so there will be some problem for this kind of client
+function test()
+{
+    get_user_input
+    LogPrint "${Fmt_INFO}" "your input branch name is ${g_ParaBranchName}" 
 }
 
 # RANDOM system variable, range 0-32767
@@ -488,6 +816,67 @@ function __div {
     else
         LogPrint -1
     fi
+}
+
+# Ex: globmatches [ -q ] string globpattern
+# Does $1 match the glob expr $2 ?
+# -q flag = set return status to 0 (true) or 1 (false)
+# no -q flag = echo "1" (true) or "0" (false)
+# Unfortunately, the return status is opposite from the echo'ed string
+function globmatches()
+{
+    if [ $1 = "-q" ]; then
+        shift
+        case "$1" in
+            $2 ) true ;;
+            * ) false ;;
+        esac
+    else
+        case "$1" in
+            $2 ) echo 1 ; true ;;
+            * ) echo 0 ; false ;;
+        esac
+    fi
+}
+# test command
+# if globmatches -q $1 "*.tar" ; then
+#   echo "Found a tar file"
+# elif globmatches -q $1 "*zip" ; then
+#   echo "Found a zip file"
+# fi
+
+
+# TODO : there is a variable in the ENV, named SECONDS it can also record the time
+function CalcConsumedTime()
+{
+    # depend on g_StartTime, which is set at the very begining of the script
+    # also gReturnValue is used in this function, which is the return status of the script
+
+    local -i Seconds=0
+    local -i Minutes=0
+    local -i Hours=0
+    local -i TimeDiff=0
+    local    Duration="0 sec"
+    local    LogColour="\033[7m\033[31m" # fg red, exchange the bg and fg
+
+    g_EndTime="$(date "+%F %T %Z")"
+    ((TimeDiff = $(date -d "${g_EndTime}" +%s) - $(date -d "${g_StartTime}" +%s)))
+    ((Seconds = TimeDiff % 60))
+    ((Hours = TimeDiff / 60))
+    ((Minutes = Hours % 60))
+    ((Hours = Hours / 60))
+    if [ "${Seconds}" != "0" ];then Duration="${Seconds} sec"; fi
+    if [ "${Minutes}" != "0" ];then Duration="${Minutes} min ${Duration}"; fi
+    if [ "${Hours}"   != "0" ];then Duration="${Hours} hour ${Duration}"; fi
+
+    if [ "${gReturnValue}" != "0" ];then
+        LogColour="\033[7m\033[31m"
+    else
+        LogColour="\033[7m\033[32m" # fg green, exchange the bg and fg
+    fi
+    LogPrint "${Fmt_SPECIAL}" "Job done, Duration : ${LogColour}${g_StartTime} ~ ${g_EndTime}\033[0m, ${LogColour} ${Duration} \033[0m."
+    
+    return 0
 }
 
 # end of bash_lib file
