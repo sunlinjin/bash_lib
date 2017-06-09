@@ -385,7 +385,7 @@ function IsInt()
 # test command : for var in 1 2 3;do echo ${var};pause;done
 function pause()
 {
-    LogPrint "+++++++++++++++++++++++++ Press any key to continue ! +++++++++++++++++++++++++"
+    LogPrint "+++++++++++++++++++++++++ Press any key to continue... +++++++++++++++++++++++++"
     SAVEDSTTY="$(stty -g)"
     stty -echo
     stty raw
