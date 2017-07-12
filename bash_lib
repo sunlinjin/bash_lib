@@ -873,7 +873,7 @@ function CalcConsumedTimeHighResolution()
 
     # year.month.day.week.day_in_week.hour.minute.second.nanosecond
     # date +%Y.%m.%d.%U.%u.%H.%M.%N
-    g_EndTime="$(date +%Y.%m.%d.%H.%M.%N)"
+    g_EndTime="$(date +%Y.%m.%d.%H.%M.%S.%N)"
     ((year    = 10#"$(echo $g_EndTime | cut -d '.' -f 1)" - 10#"$(echo $g_StartTime | cut -d '.' -f 1)"))
     ((month   = 10#"$(echo $g_EndTime | cut -d '.' -f 2)" - 10#"$(echo $g_StartTime | cut -d '.' -f 2)"))
     ((day     = 10#"$(echo $g_EndTime | cut -d '.' -f 3)" - 10#"$(echo $g_StartTime | cut -d '.' -f 3)"))
@@ -883,7 +883,7 @@ function CalcConsumedTimeHighResolution()
     ((nanosec = 10#"$(echo $g_EndTime | cut -d '.' -f 7)" - 10#"$(echo $g_StartTime | cut -d '.' -f 7)"))
 
     if [ ${year} -lt 0 -o ${month} -lt 0 -o ${day} -lt 0 -o ${Hours} -lt 0 -o ${Minutes} -lt 0 -o ${Seconds} -lt 0 -o ${nanosec} -lt 0 ]; then
-        LogPrint "${Fmt_ERROR}" "Something wrong with the system time, begin time($g_StartTime) is newer than end time($g_EndTime)."
+        LogPrint "${Fmt_ERROR}" "Something wrong with the system time, begin time($g_StartTime) is later than end time($g_EndTime)."
         return 1
     fi
 
