@@ -871,9 +871,9 @@ function CalcConsumedTimeHighResolution()
     local    Duration=""
     local    LogColour="\033[7m\033[31m" # fg red, exchange the bg and fg
 
-    # year.month.day.week.day_in_week.hour.minute.second.nanosecond
-    # date +%Y.%m.%d.%U.%u.%H.%M.%N
-    g_EndTime="$(date +%Y.%m.%d.%H.%M.%S.%N)"
+    # year.month.day.week.day_in_week.hour.minute.second.nanosecond.timezone
+    # date +%Y.%m.%d.%U.%u.%H.%M.%N.%Z
+    g_EndTime="$(date +%Y.%m.%d.%H.%M.%S.%N.%Z)"
     ((year    = 10#"$(echo $g_EndTime | cut -d '.' -f 1)" - 10#"$(echo $g_StartTime | cut -d '.' -f 1)"))
     ((month   = 10#"$(echo $g_EndTime | cut -d '.' -f 2)" - 10#"$(echo $g_StartTime | cut -d '.' -f 2)"))
     ((day     = 10#"$(echo $g_EndTime | cut -d '.' -f 3)" - 10#"$(echo $g_StartTime | cut -d '.' -f 3)"))
