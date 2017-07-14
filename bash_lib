@@ -889,12 +889,12 @@ function CalcConsumedTimeHighResolution()
 
     # the order of the following command line matters.
     if [ "${year}"    != "0"                        ];then Duration="${year} year"; fi
-    if [ "${month}"   != "0" -o "${Duration}" != "" ];then Duration="${month} month ${Duration}"; fi
-    if [ "${day}"     != "0" -o "${Duration}" != "" ];then Duration="${day} day ${Duration}"; fi
-    if [ "${Hours}"   != "0" -o "${Duration}" != "" ];then Duration="${Hours} hour ${Duration}"; fi
-    if [ "${Minutes}" != "0" -o "${Duration}" != "" ];then Duration="${Minutes} minute ${Duration}"; fi
-    if [ "${Seconds}" != "0" -o "${Duration}" != "" ];then Duration="${Seconds} Second ${Duration}"; fi
-    if [ "${nanosec}" != "0" -o "${Duration}" != "" ];then Duration="${nanosec} nanosec ${Duration}"; fi
+    if [ "${month}"   != "0" -o "${Duration}" != "" ];then Duration="${Duration} ${month} month"; fi
+    if [ "${day}"     != "0" -o "${Duration}" != "" ];then Duration="${Duration} ${day} day"; fi
+    if [ "${Hours}"   != "0" -o "${Duration}" != "" ];then Duration="${Duration} ${Hours} hour"; fi
+    if [ "${Minutes}" != "0" -o "${Duration}" != "" ];then Duration="${Duration} ${Minutes} minute"; fi
+    if [ "${Seconds}" != "0" -o "${Duration}" != "" ];then Duration="${Duration} ${Seconds} Second"; fi
+    if [ "${nanosec}" != "0" -o "${Duration}" != "" ];then Duration="${Duration} ${nanosec} nanosec"; fi
 
     if [ "${gReturnValue}" != "0" ];then
         LogColour="\033[7m\033[31m"
