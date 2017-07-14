@@ -14,7 +14,8 @@ if [ "0" = "${bash_lib_included_flag:-0}" ]; then
 #	declare -r MESSAGE="message" # no color
 #	declare -r SPECIAL="special" # exceptional case, print the specified color test, the color control string should be in the second para.
 #	declare -r HIGHLIGHT="highlight" #same with sourceInsight, highlight the messages, yellow background and black text
-#	
+#	declare -r ColorOff='\033[0m'
+#
 #	declare -r Fmt_ECHO="echo" # just to replace echo, same effect with message
 #	declare -r Fmt_ERROR="error" # print red colour text
 #	declare -r Fmt_WARN="warn" # print yellow colour text
@@ -832,7 +833,7 @@ function CalcConsumedTime()
     local -i Hours=0
     local -i TimeDiff=0
     local    Duration="0 sec"
-    local    LogColour="\033[7m\033[31m" # fg red, exchange the bg and fg
+    local    LogColor="\033[7m\033[31m" # fg red, exchange the bg and fg
 
     g_EndTime="$(date "+%F %T %Z")"
     ((TimeDiff = $(date -d "${g_EndTime}" +%s) - $(date -d "${g_StartTime}" +%s)))
@@ -844,18 +845,16 @@ function CalcConsumedTime()
     if [ "${Minutes}" != "0" ];then Duration="${Minutes} min ${Duration}"; fi
     if [ "${Hours}"   != "0" ];then Duration="${Hours} hour ${Duration}"; fi
 
-    if [ "${gReturnValue}" != "0" ];then
-        LogColour="\033[7m\033[31m"
-    else
-        LogColour="\033[7m\033[32m" # fg green, exchange the bg and fg
+    if [ "${gReturnValue}" = "0" ];then
+        LogColor="\033[7m\033[32m" # fg green, exchange the bg and fg
     fi
-    LogPrint "${Fmt_SPECIAL}" "Job done, Duration : ${LogColour}${g_StartTime} ~ ${g_EndTime}\033[0m, ${LogColour} ${Duration} \033[0m."
+    LogPrint "${Fmt_SPECIAL}" "\nJob done, Duration : ${LogColor}${g_StartTime}${ColorOff} ~ ${LogColor}${g_EndTime}${ColorOff}, ${LogColor}${Duration}${ColorOff}."
     
     return 0
 }
 
 # New Implementation with High Resolution Time
-# TODO : g_StartTime is also needed
+# TODO : g_StartTime is also needed, declare -r g_BeginTime="$(date +%Y.%m.%d.%H.%M.%S.%N.%Z)"
 function CalcConsumedTimeHighResolution()
 {
     # depend on g_StartTime, which is set at the very begining of the script
@@ -874,18 +873,18 @@ function CalcConsumedTimeHighResolution()
     # year.month.day.week.day_in_week.hour.minute.second.nanosecond.timezone
     # date +%Y.%m.%d.%U.%u.%H.%M.%N.%Z
     g_EndTime="$(date +%Y.%m.%d.%H.%M.%S.%N.%Z)"
-    ((year    = 10#"$(echo $g_EndTime | cut -d '.' -f 1)" - 10#"$(echo $g_StartTime | cut -d '.' -f 1)"))
-    ((month   = 10#"$(echo $g_EndTime | cut -d '.' -f 2)" - 10#"$(echo $g_StartTime | cut -d '.' -f 2)"))
-    ((day     = 10#"$(echo $g_EndTime | cut -d '.' -f 3)" - 10#"$(echo $g_StartTime | cut -d '.' -f 3)"))
-    ((Hours   = 10#"$(echo $g_EndTime | cut -d '.' -f 4)" - 10#"$(echo $g_StartTime | cut -d '.' -f 4)"))
-    ((Minutes = 10#"$(echo $g_EndTime | cut -d '.' -f 5)" - 10#"$(echo $g_StartTime | cut -d '.' -f 5)"))
-    ((Seconds = 10#"$(echo $g_EndTime | cut -d '.' -f 6)" - 10#"$(echo $g_StartTime | cut -d '.' -f 6)"))
-    ((nanosec = 10#"$(echo $g_EndTime | cut -d '.' -f 7)" - 10#"$(echo $g_StartTime | cut -d '.' -f 7)"))
+    ((year    = 10#"$(echo $g_EndTime | cut -d '.' -f 1)" - 10#"$(echo $g_BeginTime | cut -d '.' -f 1)"))
+    ((month   = 10#"$(echo $g_EndTime | cut -d '.' -f 2)" - 10#"$(echo $g_BeginTime | cut -d '.' -f 2)"))
+    ((day     = 10#"$(echo $g_EndTime | cut -d '.' -f 3)" - 10#"$(echo $g_BeginTime | cut -d '.' -f 3)"))
+    ((Hours   = 10#"$(echo $g_EndTime | cut -d '.' -f 4)" - 10#"$(echo $g_BeginTime | cut -d '.' -f 4)"))
+    ((Minutes = 10#"$(echo $g_EndTime | cut -d '.' -f 5)" - 10#"$(echo $g_BeginTime | cut -d '.' -f 5)"))
+    ((Seconds = 10#"$(echo $g_EndTime | cut -d '.' -f 6)" - 10#"$(echo $g_BeginTime | cut -d '.' -f 6)"))
+    ((nanosec = 10#"$(echo $g_EndTime | cut -d '.' -f 7)" - 10#"$(echo $g_BeginTime | cut -d '.' -f 7)"))
 
-    if [ ${year} -lt 0 -o ${month} -lt 0 -o ${day} -lt 0 -o ${Hours} -lt 0 -o ${Minutes} -lt 0 -o ${Seconds} -lt 0 -o ${nanosec} -lt 0 ]; then
-        LogPrint "${Fmt_ERROR}" "Something wrong with the system time, begin time($g_StartTime) is later than end time($g_EndTime)."
-        return 1
-    fi
+    # if [ ${year} -lt 0 -o ${month} -lt 0 -o ${day} -lt 0 -o ${Hours} -lt 0 -o ${Minutes} -lt 0 -o ${Seconds} -lt 0 -o ${nanosec} -lt 0 ]; then
+        # LogPrint "${ERROR}" "Something wrong with the system time, begin time($g_StartTime) is later than end time($g_EndTime)."
+        # return 1
+    # fi
 
     # the order of the following command line matters.
     if [ "${year}"    != "0"                        ];then Duration="${year} year"; fi
@@ -893,15 +892,13 @@ function CalcConsumedTimeHighResolution()
     if [ "${day}"     != "0" -o "${Duration}" != "" ];then Duration="${Duration} ${day} day"; fi
     if [ "${Hours}"   != "0" -o "${Duration}" != "" ];then Duration="${Duration} ${Hours} hour"; fi
     if [ "${Minutes}" != "0" -o "${Duration}" != "" ];then Duration="${Duration} ${Minutes} minute"; fi
-    if [ "${Seconds}" != "0" -o "${Duration}" != "" ];then Duration="${Duration} ${Seconds} Second"; fi
-    if [ "${nanosec}" != "0" -o "${Duration}" != "" ];then Duration="${Duration} ${nanosec} nanosec"; fi
+    if [ "${Seconds}" != "0" -o "${Duration}" != "" ];then Duration="${Duration} ${Seconds} second"; fi
+    if [ "${nanosec}" != "0" -o "${Duration}" != "" ];then Duration="${Duration} ${nanosec} nanoseconds"; fi
 
-    if [ "${gReturnValue}" != "0" ];then
-        LogColour="\033[7m\033[31m"
-    else
+    if [ "${gReturnValue}" = "0" ];then
         LogColour="\033[7m\033[32m" # fg green, exchange the bg and fg
     fi
-    LogPrint "${Fmt_SPECIAL}" "Job done, Duration : ${LogColour}${g_StartTime} ~ ${g_EndTime}\033[0m, ${LogColour} ${Duration} \033[0m."
+    LogPrint "${SPECIAL}" "\nJob done, Duration : ${LogColour}${g_BeginTime}${ColorOff} ~ ${LogColour}${g_EndTime}${ColorOff}, ${LogColour}${Duration} ${ColorOff}."
     
     return 0
 }
