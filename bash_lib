@@ -964,7 +964,7 @@ function parallel_run_FIFO()
             # bash -c "$1" 2>&1 | tee -a "${fifo}.${cnt}.log"
             bash -c "$1" &>> "${fifo}.${cnt}.log"
             echo >&6
-        } & # fork a new shell to execute the command.
+        } &>>"${fifo}.log" & # fork a new shell to execute the command.
         (( cnt = cnt + 1 ))
         shift
     done
