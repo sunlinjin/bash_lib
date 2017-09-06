@@ -299,6 +299,27 @@ function get_expected_date()
     return 0
 }
 
+# Input Para : $1 / $2 two date, like '20170906' or '20170906 12:24:40'
+function get_Interval_days()
+{
+	local -i Sec1=$(date -d "$1" +%s)
+	local -i Sec2=$(date -d "$2" +%s)
+	
+	if [ $# -ge 3 ];then
+		if [ $Sec1 -gt $Sec2 ];then
+			echo "date $1 is $(( ($Sec1 - $Sec2)/(24*60*60) )) days after $2"
+		else
+			echo "date $1 is $(( ($Sec2 - $Sec1)/(24*60*60) )) days before $2"
+		fi
+	else
+		if [ $Sec1 -gt $Sec2 ];then
+			echo "$(( ($Sec1 - $Sec2)/(24*60*60) ))"
+		else
+			echo "$(( ($Sec2 - $Sec1)/(24*60*60) ))"
+		fi
+	fi
+}
+
 function IsInt()
 {
     expr $1 + 0&>/dev/null
