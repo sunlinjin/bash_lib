@@ -941,6 +941,11 @@ function parallel_run_FIFO()
     exec 6<>$fifo_tmp     # use fd6 to access the fifo file
     /bin/rm -f $fifo_tmp          # no more needed, can be deleted
 
+    if [ "$1" = "-h" -o "$1" = "--help" ];then
+        echo "$0 [thread num] cmd1 cmd2 cmd3 ..."
+        return 0
+    fi
+
     if [ $# -lt 2 ];then echo "At least two parameters are needed."; return 1;fi
 
     local thread_num=$1
@@ -960,14 +965,14 @@ function parallel_run_FIFO()
         read -u6 # get token, if all the token occpuied, wait
 
         {
-            echo -e "$1\n\n" > ${fifo}.${cnt}.log
-            # bash -c "$1" 2>&1 | tee -a "${fifo}.${cnt}.log"
-            bash -c "$1" &>> "${fifo}.${cnt}.log"
+            echo -e "$1\n\n" > ${fifo}.log.${cnt}
+            # bash -c "$1" 2>&1 | tee -a "${fifo}.log.${cnt}" # display log on the terminal
+            bash -c "$1" &>> "${fifo}.log.${cnt}"
             echo >&6
-        } &>>"${fifo}.log" & # fork a new shell to execute the command.
+        } & # fork a new shell to execute the command.
         (( cnt = cnt + 1 ))
         shift
-    done
+    done &>>"${fifo}.log.pid"
 
     wait
     exec 6>&- # close fd6
