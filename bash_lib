@@ -934,11 +934,12 @@ function CalcConsumedTimeHighResolution()
 # output     : log file will be created in the working directory. and the file will be named by the processid.fifo.log
 function parallel_run_FIFO()
 {
+     local -i cnt=0
     local -r fifo="$$.fifo"
     local -r fifo_tmp="/dev/shm/${fifo}"
     mkfifo $fifo_tmp      # Create a new fifo file
     exec 6<>$fifo_tmp     # use fd6 to access the fifo file
-    rm $fifo_tmp          # no more needed, can be deleted
+    rm -f $fifo_tmp          # no more needed, can be deleted
 
     if [ $# -lt 2 ];then echo "At least two parameters are needed."; return 1;fi
 
@@ -959,11 +960,11 @@ function parallel_run_FIFO()
         read -u6 # get token, if all the token occpuied, wait
 
         {
-            echo -e "$1\n\n" > ${fifo}.log
-            bash -c "$1" 2>&1 | tee -a "${fifo}.log"
-            sleep 0.5
+            echo -e "$1\n\n" > ${fifo}.${cnt}.log
+            bash -c "$1" 2>&1 | tee -a "${fifo}.${cnt}.log"
             echo >&6
         } & # fork a new shell to execute the command.
+        (( cnt = cnt + 1 ))
         shift
     done
 
