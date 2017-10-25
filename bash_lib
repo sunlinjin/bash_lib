@@ -1,5 +1,8 @@
 # begin of bash_lib file
 
+# TODO
+# sorting array, string ...
+
 if [ "0" = "${bash_lib_included_flag:-0}" ]; then
     declare -x bash_lib_included_flag=bash_lib_included
     #echo "$0 $BASH_SOURCE (${BASH_SOURCE[@]})"
